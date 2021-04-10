@@ -3,6 +3,21 @@ import numpy as np
 import pandas as pd
 # this is a raw script that ports the original fortran code
 # by @Gianangelo Bracco to python
+def calculate_third_degree_coefficients(x,y):
+    c = [0,0,0]
+    x10 = x[1] - x(0)
+    xq01 = x[0] ** 2 - x[1] ** 2
+    x20 = x[2] - x[0]
+    xq02 = x[0] ** 2 - x[2] ** 2
+
+    y10 = y[1] - y[0]
+    y20 = y[2] - y[0]
+    p = y20 / x20 - y10 / x10
+    q = xq01 / x10 - xq02 / x20
+    c[2] = p / q
+    c[1] = (c[2] * xq02 + y20) / x20
+    c[0] = y[0] - c[2] * x[0] ** 2 - c[1] * x[0]
+    return c
 
 msuk = 4.814053e-4
 r_l = 2.5
@@ -20,5 +35,37 @@ n_temp = len(t0_v)
 
 # read the values of Omega(T) (the collision integral)
 potential_type = 'LJ' # lennard-jones potential
-path = 'experimental_data/'+'omega_'+potential_type
-omega = pd.read_table(path)
+path = '../numerical_data/'+'omega_'+potential_type+'.dat'
+omega = pd.read_table(path, sep="\s+",header=None, names=['dat_T', 'dat_0'])
+[dat_T,dat_0] = [omega['dat_T'].values,omega['dat_0'].values]
+
+# initialise null variables as done in the original fortran code
+cd_old = [None,None,None]
+cd = cd_old
+x=[None,None,None]
+y=[None,None,None]
+c = np.zeros([len(dat_T),3])
+
+# interpolate omega with T using a second order polinomial [todo: vectorise]
+# todo: call fortran subroutines from python and test them with unit tests
+for kk in np.arange(1,len(dat_T),1):
+    for dimension in np.arange(0,3,1):
+        cd_old[dimension]=cd[dimension]
+        x[dimension] = dat_T[kk - 1 + dimension]
+        y[dimension] = dat_0[kk - 1 + dimension]
+    cd = calculate_third_degree_coefficients(x,y)
+    if kk==1:
+        for dimension in np.arange(0, 3, 1):
+            c[kk-1,dimension] = cd[dimension]
+    else:
+        for dimension in np.arange(0, 3, 1):
+            c[kk-1,dimension] = (cd[dimension]+cd_old[dimension])/2
+            if kk==len(dat_T)-1:
+                c[kk,dimension] = cd[dimension]
+
+# obtain the names of the output files
+
+
+
+
+
