@@ -46,7 +46,7 @@ x=[None,None,None]
 y=[None,None,None]
 c = np.zeros([len(dat_T),3])
 
-# interpolate omega with T using a second order polinomial [todo: vectorise]
+# first routine: interpolate omega with T using a second order polinomial [todo: vectorise]
 # todo: call fortran subroutines from python and test them with unit tests
 for kk in np.arange(1,len(dat_T),1):
     for dimension in np.arange(0,3,1):
@@ -63,8 +63,9 @@ for kk in np.arange(1,len(dat_T),1):
             if kk==len(dat_T)-1:
                 c[kk,dimension] = cd[dimension]
 
-# obtain the names of the output files
-
+# second routine: obtain the names of the output files
+# third routine: set initial conditions for an spherical approximation
+# fourth routine: solve the system of differential partial equations
 
 
 
