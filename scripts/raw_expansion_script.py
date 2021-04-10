@@ -5,7 +5,7 @@ import pandas as pd
 # by @Gianangelo Bracco to python
 def calculate_third_degree_coefficients(x,y):
     c = [0,0,0]
-    x10 = x[1] - x(0)
+    x10 = x[1] - x[0]
     xq01 = x[0] ** 2 - x[1] ** 2
     x20 = x[2] - x[0]
     xq02 = x[0] ** 2 - x[2] ** 2
@@ -44,11 +44,12 @@ cd_old = [None,None,None]
 cd = cd_old
 x=[None,None,None]
 y=[None,None,None]
-c = np.zeros([len(dat_T),3])
+c = np.zeros([len(dat_T)-1,3])
 
 # first routine: interpolate omega with T using a second order polinomial [todo: vectorise]
 # todo: call fortran subroutines from python and test them with unit tests
-for kk in np.arange(1,len(dat_T),1):
+# todo: simplify using python functions and vectorisation
+for kk in np.arange(1,len(dat_T)-1,1):
     for dimension in np.arange(0,3,1):
         cd_old[dimension]=cd[dimension]
         x[dimension] = dat_T[kk - 1 + dimension]
@@ -60,9 +61,9 @@ for kk in np.arange(1,len(dat_T),1):
     else:
         for dimension in np.arange(0, 3, 1):
             c[kk-1,dimension] = (cd[dimension]+cd_old[dimension])/2
-            if kk==len(dat_T)-1:
+            if kk==len(dat_T)-2:
                 c[kk,dimension] = cd[dimension]
-
+print(c)
 # second routine: obtain the names of the output files
 # third routine: set initial conditions for an spherical approximation
 # fourth routine: solve the system of differential partial equations
