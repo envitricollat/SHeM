@@ -1,5 +1,6 @@
 from scipy.constants import k as k_b
 import numpy as np
+import pandas as pd
 # this is a raw script that ports the original fortran code
 # by @Gianangelo Bracco to python
 
@@ -17,4 +18,7 @@ t0_v = [300,131,132]
 n_press = len(p0d_v)
 n_temp = len(t0_v)
 
-# read the values of Omega(T)
+# read the values of Omega(T) (the collision integral)
+potential_type = 'LJ' # lennard-jones potential
+path = 'experimental_data/'+'omega_'+potential_type
+omega = pd.read_table(path)
