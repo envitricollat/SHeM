@@ -1,2 +1,2 @@
 # SHeM
-Utilities for Scanning Helium Microscopy, Molecular beams, and supersonic expansions into vacuum.
+Utilities for Scanning Helium Microscopy, Molecular beams, and resolving the supersonic expansion of Helium Gas into vacuum.
