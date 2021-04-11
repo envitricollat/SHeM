@@ -68,6 +68,41 @@ def EOS(temp,rho):
     eos = 10 * (1.510671273545713e-12 * dens ** 5 +tempo1 / np.exp(0.0002061897349793637e0 * dens ** 2)+ 0.00001517967494360068e0 * dens ** 8 *(3.298960057070999e-11 / tp2 + 6.446881346447997e-13 / temp)+ 0.0002431906389510405e0 * dens ** 6 * (-(5.501158366750001e-8 / tp2)+ 1.050712335784999e-8 / temp) + tempo3)
     return eos
 
+def diff_temperatures_withradius(r,t_r, c, dat_T):
+    tp_r = [0,0]
+    msuk = 4.814053e-4
+    ris = integrate_custom(t_r, c, dat_T)
+    ris = 2 * (n_r / u_r) * ris / (t_r[0] * np.sqrt(t_r[1]))
+    t1 = u_r ** 2. * msuk
+    tp_r[0] = -2.e0 * t_r[0] / r + ris
+    tp_r[1] = (-2.e0 * ris * t1 + 2.e0 * t_r[1] *(-2.e0 * t_r[0] / r + ris)) / (t1 - 3.e0 * t_r[1])
+    return tp_r
+
+def integrate_custom(t_r, c, dat_T):
+    A_O = 2.48004e-20
+    ris = 0.e0
+    dchi = 1.e-2
+    chi = dchi
+    flag1 = True
+    while flag1:
+        a = (t_r[1] - t_r[0]) / t_r[1]
+        t_eff = t_r[1] / (1 - a * chi ** 2.)
+        flag2 = True
+        i = 0
+        while flag2:
+            if dat_T[i]>t_eff:
+                flag2 =False
+            i = i + 1
+        if i==1:
+            omega = 0
+        elif i>1 & i<=len(dat_T):
+            omega = A_O * ( c[i-1, 2] * t_eff**2. + c[i-1, 1]* t_eff + c[i-1, 0])
+        fun = t_eff ** (5. / 2.) * omega * (3. * chi ** 2. - 1.)
+        ris = ris + fun * dchi
+        chi = chi + dchi
+        if chi>1: flag1 =False
+    return ris
+
 msuk = 4.814053e-4
 r_l = 2.5
 gamma = 5/3
@@ -132,6 +167,17 @@ for l in range(n_temp):
         u_l = M * np.sqrt(gamma * t_l / msuk)
         n_l = p0d / (k_b * t0) * t_l0 ** (1.e0 / (gamma - 1.e0))
         # fourth routine: solve the system of differential partial equations
+        fi = n_l * u_l * r_l**2
+        r = r_l
+        u_r = u_l
+        n_r = n_l
+        t_r = [t_l, t_l]
+        j = 0
+
+        flag = True
+        while flag:
+            h = h_0 * pas ** j
+            tp_r = diff_temperatures_withradius(r,t_r,c,dat_T)
 
 
 
