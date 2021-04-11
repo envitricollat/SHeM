@@ -76,7 +76,7 @@ def diff_temperatures_withradius(r,t_r, c, dat_T):
     t1 = u_r ** 2. * msuk
     tp_r[0] = -2.e0 * t_r[0] / r + ris
     tp_r[1] = (-2.e0 * ris * t1 + 2.e0 * t_r[1] *(-2.e0 * t_r[0] / r + ris)) / (t1 - 3.e0 * t_r[1])
-    return tp_r
+    return np.array(tp_r)
 
 def integrate_custom(t_r, c, dat_T):
     A_O = 2.48004e-20
@@ -178,6 +178,29 @@ for l in range(n_temp):
         while flag:
             h = h_0 * pas ** j
             tp_r = diff_temperatures_withradius(r,t_r,c,dat_T)
+            t_rn = t_r + h * tp_r / 6.
+            r = r + h / 2.
+            for i in [0,1]:
+                t_r1 = t_r + h / 2. * tp_r
+                tp_r = diff_temperatures_withradius(r, t_r1, c, dat_T)
+                t_rn = t_rn + h * tp_r / 3.
+            r = r + h / 2.
+            t_r1 = t_r + h * tp_r
+            tp_r = diff_temperatures_withradius(r, t_r, c, dat_T)
+            t_r = t_rn + h * tp_r / 6.
+            u_r = np.sqrt((T_Ent_E - 3.e0 * t_r[1] - 2.e0 * t_r[0]) / msuk)
+            n_r = fi / (u_r * r ** 2)
+            rapp = t_r[0] / t_r[1]
+            if rapp < acc:
+                flag = False
+                # speed ratio
+                sr = np.sqrt(msuk * u_r ** 2. / (2. * t_r[1]))
+            j=j+1
+            print(j)
+        print('System of differential eqns finished. Parameters:')
+        print('Pressure: '+str(p0d))
+        print('Temperature: '+str(t0))
+        print('Speed ratio:' +str(sr))
 
 
 
