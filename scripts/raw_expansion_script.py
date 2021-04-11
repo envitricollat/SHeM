@@ -65,8 +65,8 @@ def EOS(temp,rho):
     tempo3 = tempo3 + 0.01559457081650663e0 * dens ** 3 *(-0.00004708238429298e0 + 0.002410763742104e0 / (tp2)+ 0.001132915232587e0 / temp + 1.454229259623e-6 * temp)
     tempo3 = tempo3 + 0.06241882915014949e0 * dens ** 2 *(-0.007139657549318e0 - 0.01589302471561998e0 / tp2+ 0.009728903861441e0 / temp+ 0.001260692007853e0 * temp ** 0.5e0+ 0.00004558980227431e0 * temp)
     tempo3 = tempo3 - (1.348439408105817e-18 * dens ** 9) / tp2 - (6.304713842604079e-15 * dens ** 7) / temp+ 0.002077227302253535e0 * dens * temp
-    EOS = 10 * (1.510671273545713e-12 * dens ** 5 +tempo1 / np.exp(0.0002061897349793637e0 * dens ** 2)+ 0.00001517967494360068e0 * dens ** 8 *(3.298960057070999e-11 / tp2 + 6.446881346447997e-13 / temp)+ 0.0002431906389510405e0 * dens ** 6 * (-(5.501158366750001e-8 / tp2)+ 1.050712335784999e-8 / temp) + tempo3)
-    return EOS
+    eos = 10 * (1.510671273545713e-12 * dens ** 5 +tempo1 / np.exp(0.0002061897349793637e0 * dens ** 2)+ 0.00001517967494360068e0 * dens ** 8 *(3.298960057070999e-11 / tp2 + 6.446881346447997e-13 / temp)+ 0.0002431906389510405e0 * dens ** 6 * (-(5.501158366750001e-8 / tp2)+ 1.050712335784999e-8 / temp) + tempo3)
+    return eos
 
 msuk = 4.814053e-4
 r_l = 2.5
@@ -113,16 +113,25 @@ for kk in np.arange(1,len(dat_T)-1,1):
             if kk==len(dat_T)-2:
                 c[kk,dimension] = cd[dimension]
 print(c)
-# second routine: obtain the names of the output files - saves them in a matrix
+# second routine: obtain the names of the output files within the loop to solve for each combination
 for l in range(n_temp):
     for k in range(n_press):
         t0 = t0_v[l]
         p0d = p0d_v[k]
         # correction for a real gas - only valid for helium
         rho_r = rho_real(t0,p0d)
-
-# third routine: set initial conditions for an spherical approximation
-# fourth routine: solve the system of differential partial equations
+        # L*bar in Joule/molecola
+        dE_real = 2e0*p0d/rho_r/1e-2/6.02214179e23/k_b
+        # internal energy 3 kT plus PV
+        T_Ent_E = 3.0e0 * t0 + dE_real
+        name = 't'+ str(t0)+'p'+str(p0d)+'LJ'+'.dat'
+        # third routine: set initial conditions for an spherical approximation
+        M = ( r_l**(gamma-1.e0) )*(3.232 - .7563/r_l +.3937/(r_l**2) - .0729/(r_l**3))
+        t_l0 = 1 / (1 + (gamma-1.e0)/2 * M**2)
+        t_l = t0 * t_l0
+        u_l = M * np.sqrt(gamma * t_l / msuk)
+        n_l = p0d / (k_b * t0) * t_l0 ** (1.e0 / (gamma - 1.e0))
+        # fourth routine: solve the system of differential partial equations
 
 
 
