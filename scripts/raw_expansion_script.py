@@ -64,7 +64,14 @@ for kk in np.arange(1,len(dat_T)-1,1):
             if kk==len(dat_T)-2:
                 c[kk,dimension] = cd[dimension]
 print(c)
-# second routine: obtain the names of the output files
+# second routine: obtain the names of the output files - saves them in a matrix
+for l in range(n_temp):
+    for k in range(n_press):
+        t0 = t0_v[l]
+        p0d = p0d_v[k]
+        # correction for a real gas - only valid for helium
+
+
 # third routine: set initial conditions for an spherical approximation
 # fourth routine: solve the system of differential partial equations
 
