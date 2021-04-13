@@ -149,6 +149,7 @@ for kk in np.arange(1,len(dat_T)-1,1):
                 c[kk,dimension] = cd[dimension]
 print(c)
 # second routine: obtain the names of the output files within the loop to solve for each combination
+#todo: create a dataframe of temperatures and pressures where we can store the results
 for l in range(n_temp):
     for k in range(n_press):
         t0 = t0_v[l]
@@ -191,6 +192,7 @@ for l in range(n_temp):
             u_r = np.sqrt((T_Ent_E - 3.e0 * t_r[1] - 2.e0 * t_r[0]) / msuk)
             n_r = fi / (u_r * r ** 2)
             rapp = t_r[0] / t_r[1]
+            print(rapp)
             if rapp < acc:
                 flag = False
                 # speed ratio
