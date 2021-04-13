@@ -150,6 +150,8 @@ for kk in np.arange(1,len(dat_T)-1,1):
 print(c)
 # second routine: obtain the names of the output files within the loop to solve for each combination
 #todo: create a dataframe of temperatures and pressures where we can store the results
+global_df = pd.DataFrame(index=np.arange(n_temp*n_press),columns=['pressure','temperature','speed_ratio'])
+count = 0
 for l in range(n_temp):
     for k in range(n_press):
         t0 = t0_v[l]
@@ -203,7 +205,11 @@ for l in range(n_temp):
         print('Pressure: '+str(p0d))
         print('Temperature: '+str(t0))
         print('Speed ratio:' +str(sr))
-
-
+        global_df.iloc[count,'pressure']=p0d
+        global_df.iloc[count,'temperature']=t0
+        global_df.iloc[count,'speed_ratio']=sr
+        count   =   count+1
+print('loop completed!')
+global_df.to_csv('../experimental_data/overall_results.csv')
 
 
