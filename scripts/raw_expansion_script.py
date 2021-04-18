@@ -220,9 +220,13 @@ k_b = 1.380662e-23
 # define the values of p_0dv and T_0v (source properties)
 
 p0d_v = [
+    1,
     2,
+    4,
     6,
-    11,
+    8,
+    12,
+    16,
     21,
     31,
     41,
