@@ -380,7 +380,7 @@ for temperature_index in range(n_temp):
                 dataframe_singleexp["r"],
                 benchmark_df["r"],
                 check_exact=False,
-                atol=0.0000001,
+                atol=0.0001,
             )
             # allow for 1 m/s discrepancy in the speed
             # (way below experimental error)
