@@ -222,10 +222,11 @@ n_press = len(p0d_v)
 n_temp = len(t0_v)
 
 # read the values of Omega(T) (the collision integral)
-potential_type = "LJ"  # lennard-jones potential
+potential_type = "LJ_re"  # lennard-jones potential with a real gas correction
 path = "../numerical_data/" + "omega_" + potential_type + ".dat"
 omega = pd.read_table(path, sep=r"\s+", header=None, names=["dat_T", "dat_0"])
 [dat_T, dat_0] = [omega["dat_T"].values, omega["dat_0"].values]
+
 
 # initialise null variables as done in the original fortran code
 cd_old = [None, None, None]
@@ -273,7 +274,7 @@ for temperature_index in range(n_temp):
         dE_real = 2 * p0d / rho_r / 1e-2 / 6.02214179e23 / k_b
         # internal energy 3 kT plus PV
         T_Ent_E = 3.0 * t0 + dE_real
-        name = "t" + str(t0) + "p" + str(p0d) + "LJ" + ".dat"
+        name = "t" + str(t0) + "p" + str(p0d) + "LJ_re" + ".dat"
         # third routine: set initial conditions for an spherical approximation
         M = (r_l ** (gamma - 1.0)) * (
             3.232 - 0.7563 / r_l + 0.3937 / (r_l ** 2) - 0.0729 / (r_l ** 3)
