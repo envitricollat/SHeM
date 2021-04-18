@@ -262,6 +262,7 @@ global_df = pd.DataFrame(
     columns=["pressure", "temperature", "speed_ratio"],
 )
 count = 0
+sr = 0
 for temperature_index in range(n_temp):
     for k in range(n_press):
         t0 = t0_v[temperature_index]
