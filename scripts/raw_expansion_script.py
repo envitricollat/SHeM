@@ -355,6 +355,10 @@ for temperature_index in range(n_temp):
             j = j + 1
             dataframe_singleexp.loc[j, :] = [r, n_r, u_r, t_r[0], t_r[1]]
             print(j)
+            # for this initial iteration we are interested on
+            # testing not on completing the simulation
+            if j == 250:
+                break
         # assert with different absolute tolerances depending
         # on the physical variable used
         # select to the minimum of both indices
