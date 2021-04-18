@@ -374,26 +374,29 @@ for temperature_index in range(n_temp):
             check_exact=False,
             atol=0.0000001,
         )
-        # allow for 1 m/s mistake in the speed (way below experimental error)
+        # allow for 1 m/s discrepancy in the speed
+        # (way below experimental error)
         assert_series_equal(
             dataframe_singleexp["u_r"],
             dataframe_tocheck["u_r"],
             check_exact=False,
             atol=1,
         )
+        # allow for 0.01 K discrepancy in the temperatures
+        # (numeric error of the fortran routine)
         assert_series_equal(
             dataframe_singleexp["t_l1"],
             dataframe_tocheck["t_l1"],
             check_exact=False,
-            atol=0.001,
+            atol=0.01,
         )
         assert_series_equal(
             dataframe_singleexp["t_l2"],
             dataframe_tocheck["t_l2"],
             check_exact=False,
-            atol=0.001,
+            atol=0.01,
         )
-
+        print("ALl tests have passed!")
         print("System of differential eqns finished. Parameters:")
         print("Pressure: " + str(p0d))
         print("Temperature: " + str(t0))
