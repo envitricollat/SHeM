@@ -1,5 +1,8 @@
+from itertools import product
+
 import numpy as np
 import pandas as pd
+from pandas.testing import assert_series_equal
 from scipy.constants import k as k_b
 
 
@@ -20,6 +23,27 @@ def calculate_third_degree_coefficients(x, y):
     c[1] = (c[2] * xq02 + y20) / x20
     c[0] = y[0] - c[2] * x[0] ** 2 - c[1] * x[0]
     return c
+
+
+def load_data_benchmark(pressure_list, temperature_list, potential_type="LJ"):
+    dict_results = {}
+    col_list = ["r", "n_r", "u_r", "t_l1", "t_l2"]
+    for temperature, pressure in product(temperature_list, pressure_list):
+        key = "t" + str(temperature) + "p" + str(pressure)
+        try:
+            path = (
+                "../numerical_data/benchmark/t"
+                + str(temperature)
+                + "p"
+                + str(pressure)
+                + potential_type
+                + ".dat"
+            )
+            df = pd.read_table(path, sep=r"\s+", header=None, names=col_list)
+            dict_results[key] = df.copy()
+        except FileNotFoundError:
+            dict_results[key] = None
+    return dict_results
 
 
 def rho_real(T, P):
@@ -155,6 +179,7 @@ def diff_temperatures_withradius(r, t_r, c, dat_T):
 def integrate_custom(t_r, c, dat_T):
     A_O = 2.48004e-20
     ris = 0.0
+    omega = 0
     dchi = 1.0e-2
     chi = dchi
     flag1 = True
@@ -187,46 +212,48 @@ gamma = 5 / 3
 h_0 = 1e-3
 pas = 1.001
 acc = 1e-2
-
+# a different value of k_B was used in the fortran numerical calculations,
+# dummy print to keep the import
+print(k_b)
+# we over-write for debug (and we will for testing)
+k_b = 1.380662e-23
 # define the values of p_0dv and T_0v (source properties)
 
 p0d_v = [
-    1,
     2,
-    4,
     6,
-    8,
-    12,
-    16,
-    20,
-    25,
-    30,
-    35,
-    40,
-    50,
-    60,
-    70,
-    80,
-    90,
-    100,
-    110,
-    120,
-    130,
-    150,
-    160,
-    180,
-    200,
+    11,
+    21,
+    31,
+    41,
+    51,
+    61,
+    71,
+    81,
+    91,
+    101,
+    121,
+    131,
+    141,
+    161,
+    181,
+    201,
 ]
-t0_v = [300, 131, 132]
+t0_v = [311.5, 131]
 n_press = len(p0d_v)
 n_temp = len(t0_v)
 
 # read the values of Omega(T) (the collision integral)
 potential_type = "LJ_re"  # lennard-jones potential with a real gas correction
-path = "../numerical_data/" + "omega_" + potential_type + ".dat"
+if potential_type == "LJ_re":
+    path = "../numerical_data/" + "omega_" + "LJ" + ".dat"
+else:
+    path = "../numerical_data/" + "omega_" + potential_type + ".dat"
+
 omega = pd.read_table(path, sep=r"\s+", header=None, names=["dat_T", "dat_0"])
 [dat_T, dat_0] = [omega["dat_T"].values, omega["dat_0"].values]
-
+# load numerical benchmark and save in dictionary
+loaded_dict = load_data_benchmark(p0d_v, t0_v, potential_type)
 
 # initialise null variables as done in the original fortran code
 cd_old = [None, None, None]
@@ -256,18 +283,22 @@ for kk in np.arange(1, len(dat_T) - 1, 1):
 print(c)
 # second routine: obtain the names of the output files
 # within the loop to solve for each combination
-# todo: create a dataframe of temperatures and pressures
-#  where we can store the results
 global_df = pd.DataFrame(
     index=np.arange(n_temp * n_press),
     columns=["pressure", "temperature", "speed_ratio"],
 )
+
+global_dictionary_result = {}
 count = 0
 sr = 0
 for temperature_index in range(n_temp):
     for k in range(n_press):
         t0 = t0_v[temperature_index]
         p0d = p0d_v[k]
+        dataframe_tocheck = loaded_dict["t" + str(t0) + "p" + str(p0d)]
+        dataframe_singleexp = pd.DataFrame(
+            None, columns=["r", "n_r", "u_r", "t_l1", "t_l2"]
+        )
         # correction for a real gas - only valid for helium
         rho_r = rho_real(t0, p0d)
         # L*bar in Joule/molecola
@@ -290,6 +321,7 @@ for temperature_index in range(n_temp):
         n_r = n_l
         t_r = [t_l, t_l]
         j = 0
+        dataframe_singleexp.loc[j, :] = [r_l, n_l, u_l, t_l, t_l]
 
         flag = True
         while flag:
@@ -314,7 +346,50 @@ for temperature_index in range(n_temp):
                 # speed ratio
                 sr = np.sqrt(msuk * u_r ** 2.0 / (2.0 * t_r[1]))
             j = j + 1
+            dataframe_singleexp.loc[j, :] = [r, n_r, u_r, t_r[0], t_r[1]]
             print(j)
+        # assert with different absolute tolerances depending
+        # on the physical variable used
+        # select to the minimum of both indices
+        last_index = min(
+            [dataframe_tocheck.index.max(), dataframe_singleexp.index.max()]
+        )
+        dataframe_singleexp = dataframe_singleexp[:last_index]
+        dataframe_tocheck = dataframe_tocheck[:last_index]
+        dataframe_singleexp = dataframe_singleexp.astype("float64")
+        assert_series_equal(
+            dataframe_singleexp["n_r"],
+            dataframe_tocheck["n_r"],
+            check_exact=False,
+            atol=0.0001e19,
+            check_dtype=False,
+        )
+        assert_series_equal(
+            dataframe_singleexp["r"],
+            dataframe_tocheck["r"],
+            check_exact=False,
+            atol=0.0000001,
+        )
+        # allow for 1 m/s mistake in the speed (way below experimental error)
+        assert_series_equal(
+            dataframe_singleexp["u_r"],
+            dataframe_tocheck["u_r"],
+            check_exact=False,
+            atol=1,
+        )
+        assert_series_equal(
+            dataframe_singleexp["t_l1"],
+            dataframe_tocheck["t_l1"],
+            check_exact=False,
+            atol=0.001,
+        )
+        assert_series_equal(
+            dataframe_singleexp["t_l2"],
+            dataframe_tocheck["t_l2"],
+            check_exact=False,
+            atol=0.001,
+        )
+
         print("System of differential eqns finished. Parameters:")
         print("Pressure: " + str(p0d))
         print("Temperature: " + str(t0))
