@@ -185,7 +185,7 @@ def integrate_custom(t_r, c, dat_T):
     flag1 = True
     while flag1:
         a = (t_r[1] - t_r[0]) / t_r[1]
-        t_eff = t_r[1] / (1 - a * chi ** 2.0)
+        t_eff = t_r[0] / (1 - a * chi ** 2.0)
         flag2 = True
         i = 0
         while flag2:
@@ -285,7 +285,7 @@ for kk in np.arange(1, len(dat_T) - 1, 1):
     else:
         for dimension in np.arange(0, 3, 1):
             c[kk - 1, dimension] = (cd[dimension] + cd_old[dimension]) / 2
-            if kk == len(dat_T) - 2:
+            if kk == len(dat_T) - 1:
                 c[kk, dimension] = cd[dimension]
 print(c)
 # second routine: obtain the names of the output files
@@ -317,6 +317,7 @@ for temperature_index in range(n_temp):
         M = (r_l ** (gamma - 1.0)) * (
             3.232 - 0.7563 / r_l + 0.3937 / (r_l ** 2) - 0.0729 / (r_l ** 3)
         )
+        # initial conditions checked and ok
         t_l0 = 1 / (1 + (gamma - 1.0) / 2 * M ** 2)
         t_l = t0 * t_l0
         u_l = M * np.sqrt(gamma * t_l / msuk)
@@ -347,7 +348,6 @@ for temperature_index in range(n_temp):
             u_r = np.sqrt((T_Ent_E - 3.0 * t_r[1] - 2.0 * t_r[0]) / msuk)
             n_r = fi / (u_r * r ** 2)
             rapp = t_r[0] / t_r[1]
-            print(rapp)
             if rapp < acc:
                 flag = False
                 # speed ratio
@@ -369,6 +369,8 @@ for temperature_index in range(n_temp):
             dataframe_singleexp = dataframe_singleexp[:last_index]
             benchmark_df = benchmark_df[:last_index]
             dataframe_singleexp = dataframe_singleexp.astype("float64")
+            # this shows small difference between benchmark and code
+
             assert_series_equal(
                 dataframe_singleexp["n_r"],
                 benchmark_df["n_r"],
@@ -376,6 +378,7 @@ for temperature_index in range(n_temp):
                 atol=0.0001e19,
                 check_dtype=False,
             )
+            # this shows no difference between benchmark and code
             assert_series_equal(
                 dataframe_singleexp["r"],
                 benchmark_df["r"],
@@ -384,6 +387,7 @@ for temperature_index in range(n_temp):
             )
             # allow for 1 m/s discrepancy in the speed
             # (way below experimental error)
+            # this shows significant difference between benchmark and code
             assert_series_equal(
                 dataframe_singleexp["u_r"],
                 benchmark_df["u_r"],
@@ -392,6 +396,8 @@ for temperature_index in range(n_temp):
             )
             # allow for 0.01 K discrepancy in the temperatures
             # (numeric error of the fortran routine)
+            # this shows very significant difference between benchmark and code
+
             assert_series_equal(
                 dataframe_singleexp["t_l1"],
                 benchmark_df["t_l1"],
