@@ -369,7 +369,6 @@ for temperature_index in range(n_temp):
             dataframe_singleexp = dataframe_singleexp[:last_index]
             benchmark_df = benchmark_df[:last_index]
             dataframe_singleexp = dataframe_singleexp.astype("float64")
-            # this shows small difference between benchmark and code
 
             assert_series_equal(
                 dataframe_singleexp["n_r"],
@@ -378,7 +377,6 @@ for temperature_index in range(n_temp):
                 atol=0.0001e19,
                 check_dtype=False,
             )
-            # this shows no difference between benchmark and code
             assert_series_equal(
                 dataframe_singleexp["r"],
                 benchmark_df["r"],
@@ -387,7 +385,6 @@ for temperature_index in range(n_temp):
             )
             # allow for 1 m/s discrepancy in the speed
             # (way below experimental error)
-            # this shows significant difference between benchmark and code
             assert_series_equal(
                 dataframe_singleexp["u_r"],
                 benchmark_df["u_r"],
@@ -396,8 +393,6 @@ for temperature_index in range(n_temp):
             )
             # allow for 0.01 K discrepancy in the temperatures
             # (numeric error of the fortran routine)
-            # this shows very significant difference between benchmark and code
-
             assert_series_equal(
                 dataframe_singleexp["t_l1"],
                 benchmark_df["t_l1"],
