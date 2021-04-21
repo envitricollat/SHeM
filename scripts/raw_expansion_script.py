@@ -177,6 +177,8 @@ def diff_temperatures_withradius(r, t_r, c, dat_T):
 
 
 def integrate_custom(t_r, c, dat_T):
+    # this integral is by far the slower part of the implementation
+    # so the first that I will refactor and optimise
     A_O = 2.48004e-20
     ris = 0.0
     omega = 0
@@ -186,12 +188,13 @@ def integrate_custom(t_r, c, dat_T):
     while flag1:
         a = (t_r[1] - t_r[0]) / t_r[1]
         t_eff = t_r[0] / (1 - a * chi ** 2.0)
-        flag2 = True
-        i = 0
-        while flag2:
-            if dat_T[i] > t_eff:
-                flag2 = False
-            i = i + 1
+        i = np.where(dat_T > t_eff)[0][0] + 1
+        # flag2 = True
+        # i = 0
+        # while flag2:
+        #     if dat_T[i] > t_eff:
+        #         flag2 = False
+        #     i = i + 1
         if i == 1:
             omega = 0
         # note that we do not integrate over the last row
@@ -358,8 +361,8 @@ for temperature_index in range(n_temp):
             print(j)
             # for this initial iteration we are interested on
             # testing not on completing the simulation
-            if j == 100:
-                break
+            # if j == 100:
+            #     break
         # assert with different absolute tolerances depending
         # on the physical variable used
         # select to the minimum of both indices
