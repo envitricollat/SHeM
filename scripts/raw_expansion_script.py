@@ -198,7 +198,7 @@ def integrate_custom(t_r, c, dat_T):
         if i == 1:
             omega = 0
         # note that we do not integrate over the last row
-        elif i > 1 & i <= len(dat_T):
+        else:
             omega = A_O * (
                 c[i - 1, 2] * t_eff ** 2.0 + c[i - 1, 1] * t_eff + c[i - 1, 0]
             )
