@@ -373,23 +373,26 @@ for temperature_index in range(n_temp):
             dataframe_singleexp = dataframe_singleexp[:last_index]
             benchmark_df = benchmark_df[:last_index]
             dataframe_singleexp = dataframe_singleexp.astype("float64")
-
+            # add relative tolerance indensities
+            # due to large swings in absolute value
+            # depending on source pressure
             assert_series_equal(
                 dataframe_singleexp["n_r"],
                 benchmark_df["n_r"],
                 check_exact=False,
-                atol=0.0001e19,
+                rtol=0.001,
                 check_dtype=False,
             )
             # the power function of fortran ** at large exponents
             # does not coincide with python's and therefore a
             # discrepancy accumulates at large j's
-            # - therefore the more leniant test -
+            # - therefore the more leniant test
+            # based on relative tolerance
             assert_series_equal(
                 dataframe_singleexp["r"],
                 benchmark_df["r"],
                 check_exact=False,
-                atol=0.001,
+                rtol=0.001,
             )
             # allow for 1 m/s discrepancy in the speed
             # (way below experimental error)
@@ -420,9 +423,9 @@ for temperature_index in range(n_temp):
         print("Pressure: " + str(p0d))
         print("Temperature: " + str(t0))
         print("Speed ratio:" + str(sr))
-        global_df.iloc[count, "pressure"] = p0d
-        global_df.iloc[count, "temperature"] = t0
-        global_df.iloc[count, "speed_ratio"] = sr
+        global_df.loc[count, "pressure"] = p0d
+        global_df.loc[count, "temperature"] = t0
+        global_df.loc[count, "speed_ratio"] = sr
         count = count + 1
 print("loop completed!")
 global_df.to_csv("../experimental_data/overall_results.csv")
