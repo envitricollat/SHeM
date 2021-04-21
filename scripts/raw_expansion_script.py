@@ -361,7 +361,6 @@ for temperature_index in range(n_temp):
                 sr = np.sqrt(msuk * u_r ** 2.0 / (2.0 * t_r[1]))
             j = j + 1
             dataframe_singleexp.loc[j, :] = [r, n_r, u_r, t_r[0], t_r[1]]
-            print(j)
             # for this initial iteration we are interested on
             # testing not on completing the simulation
             # if j == 100:
@@ -426,6 +425,7 @@ for temperature_index in range(n_temp):
         print("Pressure: " + str(p0d))
         print("Temperature: " + str(t0))
         print("Speed ratio:" + str(sr))
+        # todo: include tests for this variables
         global_df.loc[count, "pressure"] = p0d
         global_df.loc[count, "temperature"] = t0
         global_df.loc[count, "speed_ratio"] = sr
