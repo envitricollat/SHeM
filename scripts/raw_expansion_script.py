@@ -181,14 +181,17 @@ def integrate_custom(t_r, c, dat_T):
     # so the first that I will refactor and optimise
     A_O = 2.48004e-20
     ris = 0.0
-    omega = 0
     dchi = 1.0e-2
     chi = dchi
     flag1 = True
+    i = 0
     while flag1:
         a = (t_r[1] - t_r[0]) / t_r[1]
         t_eff = t_r[0] / (1 - a * chi ** 2.0)
-        i = np.where(dat_T > t_eff)[0][0] + 1
+        try:
+            i = np.where(dat_T > t_eff)[0][0] + 1
+        except IndexError:
+            print("error in the integral calculation")
         # flag2 = True
         # i = 0
         # while flag2:
