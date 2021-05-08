@@ -223,7 +223,7 @@ acc = 1e-2
 # dummy print to keep the import
 print(k_b)
 # we over-write for debug (and we will for testing)
-k_b = 1.380662e-23
+# k_b = 1.380662e-23
 # define the values of p_0dv and T_0v (source properties)
 
 p0d_v = [
@@ -370,7 +370,6 @@ for temperature_index in range(n_temp):
         t0 = t0_v[temperature_index]
         p0d = p0d_v[k]
         benchmark_df = loaded_dict["t" + str(t0) + "p" + str(p0d)]
-
         experiment_df = pd.DataFrame(None, columns=column_names)
         # correction for a real gas - only valid for helium
         rho_r = rho_real(t0, p0d)
@@ -420,13 +419,7 @@ for temperature_index in range(n_temp):
                 sr = np.sqrt(msuk * u_r ** 2.0 / (2.0 * t_r[1]))
             j = j + 1
             experiment_df.loc[j, :] = [r, n_r, u_r, t_r[0], t_r[1]]
-            # for this initial iteration we are interested on
-            # testing not on completing the simulation
-            # if j == 100:
-            #     break
-        # assert with different absolute tolerances depending
-        # on the physical variable used
-        # select to the minimum of both indices
+
         if benchmark_df is not None:
             test_solutions_equal(experiment_df, benchmark_df)
         else:
