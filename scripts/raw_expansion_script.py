@@ -305,14 +305,73 @@ global_df = pd.DataFrame(
 global_dictionary_result = {}
 count = 0
 sr = 0
+
+
+def test_solutions_equal(
+    experiment_df: pd.DataFrame,
+    benchmark_df: pd.DataFrame,
+    abs_tolerance_speed=1,
+    abs_tolerance_temp=0.01,
+    rel_tolerance=0.002,
+):
+    """"""
+    last_index = min([benchmark_df.index.max(), experiment_df.index.max()])
+    experiment_df = experiment_df[:last_index]
+    benchmark_df = benchmark_df[:last_index]
+    experiment_df = experiment_df.astype("float64")
+    # add relative tolerance indensities
+    # due to large swings in absolute value
+    # depending on source pressure
+    assert_series_equal(
+        experiment_df["n_r"],
+        benchmark_df["n_r"],
+        check_exact=False,
+        rtol=rel_tolerance,
+        check_dtype=False,
+    )
+    # the power function of fortran ** at large exponents
+    # does not coincide with python's and therefore a
+    # discrepancy accumulates at large j's
+    # - therefore the more leniant test
+    # based on relative tolerance
+    assert_series_equal(
+        experiment_df["r"],
+        benchmark_df["r"],
+        check_exact=False,
+        rtol=rel_tolerance,
+    )
+    # allow for 1 m/s discrepancy in the speed
+    # (way below experimental error)
+    assert_series_equal(
+        experiment_df["u_r"],
+        benchmark_df["u_r"],
+        check_exact=False,
+        atol=abs_tolerance_speed,
+    )
+    # allow for 0.01 K discrepancy in the temperatures
+    # (numeric error of the fortran routine)
+    assert_series_equal(
+        experiment_df["t_l1"],
+        benchmark_df["t_l1"],
+        check_exact=False,
+        atol=abs_tolerance_temp,
+    )
+    assert_series_equal(
+        experiment_df["t_l2"],
+        benchmark_df["t_l2"],
+        check_exact=False,
+        atol=abs_tolerance_temp,
+    )
+
+
+column_names = ["r", "n_r", "u_r", "t_l1", "t_l2"]
 for temperature_index in range(n_temp):
     for k in range(n_press):
         t0 = t0_v[temperature_index]
         p0d = p0d_v[k]
         benchmark_df = loaded_dict["t" + str(t0) + "p" + str(p0d)]
-        dataframe_singleexp = pd.DataFrame(
-            None, columns=["r", "n_r", "u_r", "t_l1", "t_l2"]
-        )
+
+        experiment_df = pd.DataFrame(None, columns=column_names)
         # correction for a real gas - only valid for helium
         rho_r = rho_real(t0, p0d)
         # L*bar in Joule/molecola
@@ -336,7 +395,7 @@ for temperature_index in range(n_temp):
         n_r = n_l
         t_r = [t_l, t_l]
         j = 0
-        dataframe_singleexp.loc[j, :] = [r_l, n_l, u_l, t_l, t_l]
+        experiment_df.loc[j, :] = [r_l, n_l, u_l, t_l, t_l]
 
         flag = True
         while flag:
@@ -360,7 +419,7 @@ for temperature_index in range(n_temp):
                 # speed ratio
                 sr = np.sqrt(msuk * u_r ** 2.0 / (2.0 * t_r[1]))
             j = j + 1
-            dataframe_singleexp.loc[j, :] = [r, n_r, u_r, t_r[0], t_r[1]]
+            experiment_df.loc[j, :] = [r, n_r, u_r, t_r[0], t_r[1]]
             # for this initial iteration we are interested on
             # testing not on completing the simulation
             # if j == 100:
@@ -369,57 +428,9 @@ for temperature_index in range(n_temp):
         # on the physical variable used
         # select to the minimum of both indices
         if benchmark_df is not None:
-            last_index = min(
-                [benchmark_df.index.max(), dataframe_singleexp.index.max()]
-            )
-            dataframe_singleexp = dataframe_singleexp[:last_index]
-            benchmark_df = benchmark_df[:last_index]
-            dataframe_singleexp = dataframe_singleexp.astype("float64")
-            # add relative tolerance indensities
-            # due to large swings in absolute value
-            # depending on source pressure
-            assert_series_equal(
-                dataframe_singleexp["n_r"],
-                benchmark_df["n_r"],
-                check_exact=False,
-                rtol=0.001,
-                check_dtype=False,
-            )
-            # the power function of fortran ** at large exponents
-            # does not coincide with python's and therefore a
-            # discrepancy accumulates at large j's
-            # - therefore the more leniant test
-            # based on relative tolerance
-            assert_series_equal(
-                dataframe_singleexp["r"],
-                benchmark_df["r"],
-                check_exact=False,
-                rtol=0.001,
-            )
-            # allow for 1 m/s discrepancy in the speed
-            # (way below experimental error)
-            assert_series_equal(
-                dataframe_singleexp["u_r"],
-                benchmark_df["u_r"],
-                check_exact=False,
-                atol=1,
-            )
-            # allow for 0.01 K discrepancy in the temperatures
-            # (numeric error of the fortran routine)
-            assert_series_equal(
-                dataframe_singleexp["t_l1"],
-                benchmark_df["t_l1"],
-                check_exact=False,
-                atol=0.01,
-            )
-            assert_series_equal(
-                dataframe_singleexp["t_l2"],
-                benchmark_df["t_l2"],
-                check_exact=False,
-                atol=0.01,
-            )
+            test_solutions_equal(experiment_df, benchmark_df)
         else:
-            print("No benchmark data found")
+            print("There is no benchmark dataframe!")
         print("ALl tests have passed!")
         print("System of differential eqns finished. Parameters:")
         print("Pressure: " + str(p0d))
