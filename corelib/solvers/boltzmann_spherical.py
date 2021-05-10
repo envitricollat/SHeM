@@ -96,6 +96,7 @@ class BoltzmannSpherical:
         self.c = interpolate_c(self.dat_T, self.dat_0)
 
     def expansion_step(self):
+        # todo: change to use a memory class
         h = h_0 * pas ** self.j
         tp_r = diff_tempwradius(
             self.r, self.t_r, self.c, self.dat_T, self.n_r, self.u_r
