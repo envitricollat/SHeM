@@ -1,2 +1,6 @@
 scipy==1.6.2
 pandas==1.2.3
+pytest==6.2.5
+flake8==3.8.4
+black==21.8b0
+isort==5.9.3

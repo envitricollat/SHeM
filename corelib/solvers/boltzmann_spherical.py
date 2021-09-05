@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import pandas as pd
 from scipy.constants import k as k_b
@@ -28,7 +30,7 @@ class BoltzmannSpherical:
         self.get_collision_integral()
         for temperature, pressure in zip(temperatures, pressures):
             self.solve_expansion(temperature, pressure)
-        self.save_results()
+            self.save_results()
 
     def solve_expansion(
         self,
@@ -85,10 +87,11 @@ class BoltzmannSpherical:
         potential_type = (
             self.interaction_potential
         )  # lennard-jones potential with a real gas correction
+        cd = os.getcwd()
         if potential_type == "LJ_re":
-            path = "../numerical_data/" + "omega_" + "LJ" + ".dat"
+            path = cd + "/numerical_data/" + "omega_" + "LJ" + ".dat"
         else:
-            path = "../numerical_data/" + "omega_" + potential_type + ".dat"
+            path = cd + "/numerical_data/" + "omega_" + potential_type + ".dat"
         cols = ["dat_T", "dat_0"]
         omega = pd.read_table(path, sep=r"\s+", header=None, names=cols)
         self.dat_T = omega["dat_T"].values
