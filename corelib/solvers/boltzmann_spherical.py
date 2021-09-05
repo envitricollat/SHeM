@@ -44,7 +44,7 @@ class BoltzmannSpherical:
     def initialise_expansion(self, temp, press):
         rho = 0.1 * press
         rho_r = self.rho_correction(rho, temp, press)
-        # L*bar in Joule/molecola
+        # L*bar in Joule/molecule
         dE_real = 2 * press / rho_r / 1e-2 / 6.02214179e23 / k_b
         # internal energy 3 kT plus PV
         self.T_Ent_E = 3.0 * temp + dE_real
