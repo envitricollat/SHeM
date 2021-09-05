@@ -73,6 +73,37 @@ def rho_real(T, P):
     return rho
 
 
+def rho_real_python(rho, T, P):
+    # this function calculates the real rho for helium according to
+    # McCarty and Arp (1990) Advances in cryogenic engineering.
+    # C R. W. Fast. New York, Plenum Press. 35: 1465-1475.
+    # C **  Echelle provisoire de temperature de 1976. Bureau
+    # C international des poids et mesures, F-92310 Sevres, France
+    # C *** Hands, B. A. and V. D. Arp (1981) A correlation of thermal
+    # C conductivity data for helium. Cryogenics 21: 697-703.
+    # todo: proper function docstring
+    # P is in Bar, T in Kelvin
+    assert 0.1 * P == rho
+    rho = 0.1 * P
+    dr = rho * 1e-2
+    ind = 0
+    indd = 0
+
+    while ind == 0:
+        Pc = EOS(T, rho)
+        if Pc < P:
+            rho = rho + dr
+            indd = 0
+        else:
+            if indd == 0:
+                dr = 0.25 * dr
+                indd = 1
+            rho = rho - dr
+            if dr < 1e-10:
+                ind = 1
+    return rho
+
+
 def EOS(temp, rho):
     # temperature in K, density in kg/m3, pressure in bar, rho in mol/L
     # The validity range of Hands and McCarty fits (used here)

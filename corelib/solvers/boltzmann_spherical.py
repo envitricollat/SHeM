@@ -75,6 +75,7 @@ class BoltzmannSpherical:
 
     def assert_unchanged_rho_physical(self, rho, rho_r, temperature):
         if rho_r == rho:
+            # todo: double check this assertion
             assert self.T_Ent_E == 5 * temperature
         else:
             pass
@@ -87,7 +88,9 @@ class BoltzmannSpherical:
         potential_type = (
             self.interaction_potential
         )  # lennard-jones potential with a real gas correction
-        cd = os.getcwd()
+        full_path = os.path.realpath(__file__)
+        cd = os.path.dirname(full_path)
+        cd = cd[:-16]
         if potential_type == "LJ_re":
             path = cd + "/numerical_data/" + "omega_" + "LJ" + ".dat"
         else:
@@ -121,3 +124,4 @@ class BoltzmannSpherical:
         self.u_r = np.sqrt((self.T_Ent_E - 3.0 * t_r[1] - 2.0 * t_r[0]) / msuk)
         self.n_r = self.fi / (self.u_r * self.r ** 2)
         self.condition = t_r[0] / t_r[1]
+        self.j = self.j + 1
