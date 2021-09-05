@@ -2,8 +2,6 @@ import numpy as np
 import pandas as pd
 from scipy.constants import k as k_b
 
-# this is a raw script that ports the original fortran code
-# by @Gianangelo Bracco to python
 from corelib.translated_fortran_scripts import (
     diff_tempwradius,
     interpolate_c,
@@ -11,6 +9,10 @@ from corelib.translated_fortran_scripts import (
     rho_real,
     test_solutions_equal,
 )
+
+# this is a raw script that ports the original fortran code
+# by @Gianangelo Bracco to python
+
 
 msuk = 4.814053e-4
 r_l = 2.5
