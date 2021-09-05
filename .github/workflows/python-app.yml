@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest black==21.5b1 isort==5.8.0
+        pip install flake8==3.8.4 pytest black==21.8b0 isort==5.9.3
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
@@ -33,7 +33,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Check imports with isort
       run: |
-        isort --check .
+        isort --check . --profile "black"
     - name: Run code quality check with Black
       run: |
         black --check .

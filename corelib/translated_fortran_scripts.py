@@ -51,7 +51,7 @@ def rho_real(T, P):
     # C international des poids et mesures, F-92310 Sevres, France
     # C *** Hands, B. A. and V. D. Arp (1981) A correlation of thermal
     # C conductivity data for helium. Cryogenics 21: 697-703.
-    # todo: function docstring
+    # todo: proper function docstring
     # P is in Bar, T in Kelvin
     rho = 0.1 * P
     dr = rho * 1e-2
