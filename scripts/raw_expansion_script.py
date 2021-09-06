@@ -3,11 +3,11 @@ import pandas as pd
 from scipy.constants import k as k_b
 
 from corelib.translated_fortran_scripts import (
+    check_solutions_equal,
     diff_tempwradius,
     interpolate_c,
     load_data_benchmark,
     rho_real,
-    test_solutions_equal,
 )
 
 # this is a raw script that ports the original fortran code
@@ -87,7 +87,7 @@ for temperature_index in range(n_temp):
     for k in range(n_press):
         t0 = t0_v[temperature_index]
         p0d = p0d_v[k]
-        benchmark_df = loaded_dict["t" + str(t0) + "p" + str(p0d)]
+        benchmark_df = loaded_dict[(t0, p0d)]
         experiment_df = pd.DataFrame(None, columns=column_names)
         # correction for a real gas - only valid for helium
         rho_r = rho_real(t0, p0d)
@@ -139,7 +139,7 @@ for temperature_index in range(n_temp):
             experiment_df.loc[j, :] = [r, n_r, u_r, t_r[0], t_r[1]]
 
         if benchmark_df is not None:
-            test_solutions_equal(experiment_df, benchmark_df)
+            check_solutions_equal(experiment_df, benchmark_df)
         else:
             print("There is no benchmark dataframe!")
         print("ALl tests have passed!")

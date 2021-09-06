@@ -1,4 +1,5 @@
 import os
+from itertools import product
 
 import numpy as np
 import pandas as pd
@@ -9,6 +10,7 @@ from corelib.translated_fortran_scripts import diff_tempwradius, interpolate_c
 msuk = 4.814053e-4
 h_0 = 1e-3
 pas = 1.001
+column_names = ["r", "n_r", "u_r", "t_l1", "t_l2"]
 
 
 class BoltzmannSpherical:
@@ -19,16 +21,19 @@ class BoltzmannSpherical:
         gamma=5 / 3,
         r_l=2.5,
         rho_correction=lambda rho, x, y: rho,
+        persist_experiment: bool = True,
     ):
         self.interaction_potential = interaction_potential
         self.velocity_distribution = velocity_distribution
         self.gamma = gamma
         self.rho_correction = rho_correction
         self.r_l = r_l
+        self.persist_experiment = persist_experiment
+        self.dict_results = {}
 
     def solve_expansions(self, temperatures: list, pressures: list):
         self.get_collision_integral()
-        for temperature, pressure in zip(temperatures, pressures):
+        for temperature, pressure in product(temperatures, pressures):
             self.solve_expansion(temperature, pressure)
             self.save_results()
 
@@ -44,6 +49,8 @@ class BoltzmannSpherical:
             self.expansion_step()
 
     def initialise_expansion(self, temp, press):
+        self.temp = temp
+        self.press = press
         rho = 0.1 * press
         rho_r = self.rho_correction(rho, temp, press)
         # L*bar in Joule/molecule
@@ -70,6 +77,16 @@ class BoltzmannSpherical:
         self.n_r = self.n_l
         self.condition = 1
         self.j = 0
+        if self.persist_experiment:
+            tupl = (temp, press)
+            self.dict_results[tupl] = pd.DataFrame(None, columns=column_names)
+            self.dict_results[tupl].loc[self.j, :] = [
+                self.r_l,
+                self.n_l,
+                self.u_l,
+                self.t_l,
+                self.t_l,
+            ]
         # check that the rho makes sense
         self.assert_unchanged_rho_physical(rho, rho_r, temp)
 
@@ -127,3 +144,11 @@ class BoltzmannSpherical:
         self.n_r = self.fi / (self.u_r * self.r ** 2)
         self.condition = self.t_r[0] / self.t_r[1]
         self.j = self.j + 1
+        if self.persist_experiment:
+            self.dict_results[(self.temp, self.press)].loc[self.j, :] = [
+                self.r,
+                self.n_r,
+                self.u_r,
+                self.t_r[0],
+                self.t_r[1],
+            ]

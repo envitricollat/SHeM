@@ -26,7 +26,7 @@ def load_data_benchmark(pressure_list, temperature_list, potential_type="LJ"):
     dict_results = {}
     col_list = ["r", "n_r", "u_r", "t_l1", "t_l2"]
     for temperature, pressure in product(temperature_list, pressure_list):
-        key = "t" + str(temperature) + "p" + str(pressure)
+        key = (temperature, pressure)
         try:
             path = (
                 "../numerical_data/benchmark/t"
@@ -36,8 +36,9 @@ def load_data_benchmark(pressure_list, temperature_list, potential_type="LJ"):
                 + potential_type
                 + ".dat"
             )
-            df = pd.read_table(path, sep=r"\s+", header=None, names=col_list)
-            dict_results[key] = df.copy()
+            dict_results[key] = pd.read_table(
+                path, sep=r"\s+", header=None, names=col_list
+            )
         except FileNotFoundError:
             dict_results[key] = None
     return dict_results
@@ -241,7 +242,7 @@ def integrate_custom(t_r, c, dat_T):
     return ris
 
 
-def test_solutions_equal(
+def check_solutions_equal(
     experiment_df: pd.DataFrame,
     benchmark_df: pd.DataFrame,
     abs_tolerance_speed=1,
