@@ -120,8 +120,10 @@ class BoltzmannSpherical:
         tp_r = diff_tempwradius(
             self.r, self.t_r, self.c, self.dat_T, self.n_r, self.u_r
         )
-        t_r = t_rn + h * tp_r / 6.0
-        self.u_r = np.sqrt((self.T_Ent_E - 3.0 * t_r[1] - 2.0 * t_r[0]) / msuk)
+        self.t_r = t_rn + h * tp_r / 6.0
+        self.u_r = np.sqrt(
+            (self.T_Ent_E - 3.0 * self.t_r[1] - 2.0 * self.t_r[0]) / msuk
+        )
         self.n_r = self.fi / (self.u_r * self.r ** 2)
-        self.condition = t_r[0] / t_r[1]
+        self.condition = self.t_r[0] / self.t_r[1]
         self.j = self.j + 1
