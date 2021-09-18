@@ -21,7 +21,8 @@ def test_load_data(pressure):
         ],
         potential_type,
     )
-    assert loaded_dict is not None
+    for kk in loaded_dict.keys:
+        assert loaded_dict[kk] is not None
 
 
 @pytest.mark.parametrize("pressure", [1, 6])
