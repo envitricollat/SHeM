@@ -1,8 +1,11 @@
+import os
 from itertools import product
 
 import numpy as np
 import pandas as pd
 from pandas._testing import assert_series_equal
+
+ROOT_DIR = os.path.abspath(os.curdir)
 
 
 def calculate_third_degree_coefficients(x, y):
@@ -26,18 +29,20 @@ def load_data_benchmark(pressure_list, temperature_list, potential_type="LJ"):
     dict_results = {}
     col_list = ["r", "n_r", "u_r", "t_l1", "t_l2"]
     for temperature, pressure in product(temperature_list, pressure_list):
-        key = "t" + str(temperature) + "p" + str(pressure)
+        key = (temperature, pressure)
         try:
             path = (
-                "../numerical_data/benchmark/t"
+                ROOT_DIR
+                + "/numerical_data/benchmark/t"
                 + str(temperature)
                 + "p"
                 + str(pressure)
                 + potential_type
                 + ".dat"
             )
-            df = pd.read_table(path, sep=r"\s+", header=None, names=col_list)
-            dict_results[key] = df.copy()
+            dict_results[key] = pd.read_table(
+                path, sep=r"\s+", header=None, names=col_list
+            )
         except FileNotFoundError:
             dict_results[key] = None
     return dict_results
@@ -53,6 +58,37 @@ def rho_real(T, P):
     # C conductivity data for helium. Cryogenics 21: 697-703.
     # todo: proper function docstring
     # P is in Bar, T in Kelvin
+    rho = 0.1 * P
+    dr = rho * 1e-2
+    ind = 0
+    indd = 0
+
+    while ind == 0:
+        Pc = EOS(T, rho)
+        if Pc < P:
+            rho = rho + dr
+            indd = 0
+        else:
+            if indd == 0:
+                dr = 0.25 * dr
+                indd = 1
+            rho = rho - dr
+            if dr < 1e-10:
+                ind = 1
+    return rho
+
+
+def rho_real_python(rho, T, P):
+    # this function calculates the real rho for helium according to
+    # McCarty and Arp (1990) Advances in cryogenic engineering.
+    # C R. W. Fast. New York, Plenum Press. 35: 1465-1475.
+    # C **  Echelle provisoire de temperature de 1976. Bureau
+    # C international des poids et mesures, F-92310 Sevres, France
+    # C *** Hands, B. A. and V. D. Arp (1981) A correlation of thermal
+    # C conductivity data for helium. Cryogenics 21: 697-703.
+    # todo: proper function docstring
+    # P is in Bar, T in Kelvin
+    assert 0.1 * P == rho
     rho = 0.1 * P
     dr = rho * 1e-2
     ind = 0
@@ -210,7 +246,7 @@ def integrate_custom(t_r, c, dat_T):
     return ris
 
 
-def test_solutions_equal(
+def check_solutions_equal(
     experiment_df: pd.DataFrame,
     benchmark_df: pd.DataFrame,
     abs_tolerance_speed=1,
