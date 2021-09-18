@@ -1,8 +1,11 @@
+import os
 from itertools import product
 
 import numpy as np
 import pandas as pd
 from pandas._testing import assert_series_equal
+
+ROOT_DIR = os.path.abspath(os.curdir)
 
 
 def calculate_third_degree_coefficients(x, y):
@@ -29,7 +32,8 @@ def load_data_benchmark(pressure_list, temperature_list, potential_type="LJ"):
         key = (temperature, pressure)
         try:
             path = (
-                "../numerical_data/benchmark/t"
+                ROOT_DIR
+                + "/numerical_data/benchmark/t"
                 + str(temperature)
                 + "p"
                 + str(pressure)

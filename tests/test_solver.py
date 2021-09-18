@@ -21,7 +21,7 @@ def test_load_data(pressure):
         ],
         potential_type,
     )
-    for kk in loaded_dict.keys:
+    for kk in loaded_dict.keys():
         assert loaded_dict[kk] is not None
 
 
