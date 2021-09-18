@@ -46,15 +46,16 @@ def test_benchmark_expansion(pressure):
     check_solutions_equal(spherical_solver.dict_results[key], loaded_dict[key])
 
 
-# @pytest.mark.integration
-# def test_benchmark_expansions():
-#     pressure_list = [1,6]
-#     ## load benchmark data
-#     potential_type = "LJ_re"
-#     loaded_dict = load_data_benchmark(pressure_list, [311], potential_type)
-#     spherical_solver = BoltzmannSpherical(rho_correction=rho_real_python)
-#     spherical_solver.solve_expansions([311], pressure_list)
-#     for pressure in pressure_list:
-#         tup = (311,pressure)
-#         assert check_solutions_equal(spherical_solver.dict_results[tup],
-#         loaded_dict[tup])
+@pytest.mark.integration
+def test_benchmark_expansions():
+    pressure_list = [1, 6]
+    # load benchmark data
+    potential_type = "LJ_re"
+    loaded_dict = load_data_benchmark(pressure_list, [311], potential_type)
+    spherical_solver = BoltzmannSpherical(rho_correction=rho_real_python)
+    spherical_solver.solve_expansions([311], pressure_list)
+    for pressure in pressure_list:
+        tup = (311, pressure)
+        solver_df = spherical_solver.dict_results[tup]
+        dict_df = loaded_dict[tup]
+        check_solutions_equal(solver_df, dict_df)
