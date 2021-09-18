@@ -57,5 +57,5 @@ def test_benchmark_expansions():
     for pressure in pressure_list:
         tup = (311, pressure)
         solver_df = spherical_solver.dict_results[tup]
-        dict_df = loaded_dict[tup]
-        check_solutions_equal(solver_df, dict_df)
+        benchmark_df = loaded_dict[tup]
+        check_solutions_equal(solver_df, benchmark_df)
