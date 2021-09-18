@@ -39,3 +39,9 @@ jobs:
     - name: Test with pytest
       run: |
         python -m pytest
+    - uses: codecov/codecov-action@v2
+      with:
+        files: ./coverage.xml
+        fail_ci_if_error: true
+        env_vars: OS,PYTHON
+        verbose: true
