@@ -38,7 +38,7 @@ jobs:
         black --check .
     - name: Test with pytest
       run: |
-        python -m pytest
+        python -m pytest --cov=. --cov-report xml:coverage.xml --cov-config=.coveragerc
     - uses: codecov/codecov-action@v2
       with:
         files: ./coverage.xml
