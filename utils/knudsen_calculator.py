@@ -13,6 +13,8 @@ r_s = 0.5e-3
 r_nz = 50e-6
 # kinetic cross section
 sigma = 260e-12
+# kinetic cross section that corresponds to results in our intensity paper
+# sigma = 1e-14
 # gamma (for helium)
 gamma = 5 / 3
 # pressure (Pa)
