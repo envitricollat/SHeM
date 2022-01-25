@@ -11,8 +11,11 @@ from scipy.constants import k as k_b
 r_s = 0.5e-3
 # nozzle radius
 r_nz = 100e-6
-# kinetic cross section
-sigma = 260e-12
+# kinetic cross section From
+# [Bird Molcular Gas Dynamics and the
+# direct simulation of gas flows]
+# assuming a VHS diameter]
+sigma = 2.33e-10
 sigs = sigma ** 2
 # kinetic cross section that corresponds to results in our intensity paper
 # sigma = 1e-14
