@@ -10,7 +10,7 @@ from scipy.constants import k as k_b
 
 r_s = 0.5e-3
 # nozzle radius
-r_nz = 50e-6
+r_nz = 100e-6
 # kinetic cross section
 sigma = 260e-12
 sigs = sigma ** 2
