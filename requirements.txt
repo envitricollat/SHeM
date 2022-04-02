@@ -5,3 +5,4 @@ flake8==3.8.4
 black==21.8b0
 isort==5.9.3
 pytest-cov==2.12.1
+click==8.0.2
