@@ -30,7 +30,7 @@ efficiency = 2.1e-6
 Intensity = TG_intensity(pressure, temperature, nozzle_radius, det_rad, xs, a)
 # multiply by detector efficiency
 Intensity = Intensity * efficiency
-# given a list of speed ratios and pressiures, get the sikora matrix
+# given a list of speed ratios and pressures, get the sikora matrix
 S_r = [125, 300]
 T = 295
 P = np.arange(1, 100, 1)
