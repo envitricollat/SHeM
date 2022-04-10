@@ -1,4 +1,4 @@
-# a simple pyhton script that calculates the intensity
+# a simple python script that calculates the intensity
 # in a microscope using an analytical intensity equation according
 # to certain parameters
 # pressure in pascals
@@ -42,7 +42,7 @@ expansion_df["S_per"] = np.sqrt(
     m * expansion_df["v_He"] ** 2 / (2 * k_b * expansion_df["Tper"])
 )
 # nozzle radius in meters
-nozzle_radius = 5e-6
+nozzle_radius = 100e-6
 # detection radius in meters
 det_rad = 100e-6
 # distance to the skimmer
