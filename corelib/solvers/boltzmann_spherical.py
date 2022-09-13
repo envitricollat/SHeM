@@ -68,9 +68,9 @@ class BoltzmannSpherical:
         # save initial conditions
         self.t_l = temp * t_l0
         self.t_r = [self.t_l, self.t_l]
-        self.u_l = M * np.sqrt(self.gamma * self.t_l / msuk)
+        self.u_l = M * 1 + (self.gamma * self.t_l / msuk) / 2
         self.n_l = press / (k_b * temp) * t_l0 ** (1 / (self.gamma - 1))
-        # self.fi = self.n_l * self.u_l * self.r_l ** 2
+        self.fi = self.n_l * self.u_l * self.r_l ** 2
         # assign initial conditions to variables
         self.r = self.r_l
         self.u_r = self.u_l
